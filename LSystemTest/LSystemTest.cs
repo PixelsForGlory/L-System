@@ -103,7 +103,7 @@ namespace LSystemTest
     }
     #endregion
 
-    public class ModuleData : ICopy<ModuleData>
+    public class ParametricModuleData : ICopy<ParametricModuleData>
     {
         public int PositionX;
         public int PositionY;
@@ -115,14 +115,14 @@ namespace LSystemTest
             return string.Format("{0},{1},{2},{3}", PositionX, PositionY, StepsForward, Rotation);
         }
 
-        public ModuleData ShallowCopy()
+        public ParametricModuleData ShallowCopy()
         {
             throw new NotImplementedException();
         }
 
-        public ModuleData DeepCopy()
+        public ParametricModuleData DeepCopy()
         {
-            var returnData = new ModuleData
+            var returnData = new ParametricModuleData
             {
                 PositionX = PositionX,
                 PositionY = PositionY,
@@ -134,21 +134,21 @@ namespace LSystemTest
         }
     }
 
-    public class ParametricModuleEndPoint : LSystemModule<ModuleData>
+    public class ParametricModuleEndPoint : LSystemModule<ParametricModuleData>
     {
-        public ParametricModuleEndPoint(ModuleData data) : base(data){}
+        public ParametricModuleEndPoint(ParametricModuleData data) : base(data){}
 
-        public override void ChangeState(LSystemState<ModuleData> systemState)
+        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
         {
             // Do nothing
         }
     }
 
-    public class ParametricModuleMoveForward : LSystemModule<ModuleData>
+    public class ParametricModuleMoveForward : LSystemModule<ParametricModuleData>
     {
-        public ParametricModuleMoveForward(ModuleData data) : base(data){}
+        public ParametricModuleMoveForward(ParametricModuleData data) : base(data){}
 
-        public override void ChangeState(LSystemState<ModuleData> systemState)
+        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
         {
             switch(systemState.CurrentState.Rotation)
             {
@@ -168,11 +168,11 @@ namespace LSystemTest
         }
     }
 
-    public class ParametricModuleRotate : LSystemModule<ModuleData>
+    public class ParametricModuleRotate : LSystemModule<ParametricModuleData>
     {
-        public ParametricModuleRotate(ModuleData data) : base(data){}
+        public ParametricModuleRotate(ParametricModuleData data) : base(data){}
 
-        public override void ChangeState(LSystemState<ModuleData> systemState)
+        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
         {
             systemState.CurrentState.Rotation += Data.Rotation;
 
@@ -183,40 +183,40 @@ namespace LSystemTest
         }
     }
 
-    public class ParametricModulePoint : LSystemQueryModule<ModuleData>
+    public class ParametricModulePoint : LSystemQueryModule<ParametricModuleData>
     {
-        public ParametricModulePoint(ModuleData data) : base(data){}
+        public ParametricModulePoint(ParametricModuleData data) : base(data){}
 
-        public override void ChangeState(LSystemState<ModuleData> systemState)
+        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
         {
             // Do nothing
         }
 
-        public override void QueryState(LSystemState<ModuleData> systemState)
+        public override void QueryState(LSystemState<ParametricModuleData> systemState)
         {
             Data.PositionX = systemState.CurrentState.PositionX;
             Data.PositionY = systemState.CurrentState.PositionY;
         }
     }
 
-    public class ParametricProdction1 : LSystemProduction<ModuleData>
+    public class ParametricProdction1 : LSystemProduction<ParametricModuleData>
     {
         public ParametricProdction1() : base(null, typeof(ParametricModuleEndPoint), null){}
 
-        protected override bool Condition(LinkedListNode<LSystemNode<ModuleData>> predecessor)
+        protected override bool Condition(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
         {
             return true;
         }
 
-        protected override bool Probability(LinkedListNode<LSystemNode<ModuleData>> predecessor)
+        protected override bool Probability(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
         {
             return true;
         }
 
-        protected override List<LSystemNode<ModuleData>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ModuleData>> predecessor)
+        protected override List<LSystemNode<ParametricModuleData>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
         {
             var forwardModuleData =
-                new ModuleData()
+                new ParametricModuleData()
                 {
                     PositionX = 0,
                     PositionY = 0,
@@ -225,7 +225,7 @@ namespace LSystemTest
                 };
 
             var rotateModuleData =
-                new ModuleData()
+                new ParametricModuleData()
                 {
                     PositionX = 0,
                     PositionY = 0,
@@ -233,33 +233,33 @@ namespace LSystemTest
                     StepsForward = 0
                 };
 
-            var forwardNode = new LSystemNode<ModuleData>(stepNumber, new ParametricModuleMoveForward(forwardModuleData));
-            var pointNode = new LSystemNode<ModuleData>(stepNumber, new ParametricModulePoint(new ModuleData()));
-            var rotationNode = new LSystemNode<ModuleData>(stepNumber, new ParametricModuleRotate(rotateModuleData));
-            var endPointNode = new LSystemNode<ModuleData>(stepNumber, new ParametricModuleEndPoint(new ModuleData()));
+            var forwardNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleMoveForward(forwardModuleData));
+            var pointNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModulePoint(new ParametricModuleData()));
+            var rotationNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleRotate(rotateModuleData));
+            var endPointNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleEndPoint(new ParametricModuleData()));
 
-            return new List<LSystemNode<ModuleData>>(new[] { forwardNode, pointNode, rotationNode, endPointNode });
+            return new List<LSystemNode<ParametricModuleData>>(new[] { forwardNode, pointNode, rotationNode, endPointNode });
         }
     }
 
-    public class ParametricProduction2 : LSystemProduction<ModuleData>
+    public class ParametricProduction2 : LSystemProduction<ParametricModuleData>
     {
         public ParametricProduction2() : base(null, typeof(ParametricModuleMoveForward), null){}
 
-        protected override bool Condition(LinkedListNode<LSystemNode<ModuleData>> predecessor)
+        protected override bool Condition(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
         {
             return true;
         }
 
-        protected override bool Probability(LinkedListNode<LSystemNode<ModuleData>> predecessor)
+        protected override bool Probability(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
         {
             return true;
         }
 
-        protected override List<LSystemNode<ModuleData>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ModuleData>> predecessor)
+        protected override List<LSystemNode<ParametricModuleData>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
         {
             var forwardModuleData =
-                new ModuleData()
+                new ParametricModuleData()
                 {
                     PositionX = 0,
                     PositionY = 0,
@@ -267,9 +267,9 @@ namespace LSystemTest
                     StepsForward = predecessor.Value.NodeModule.Data.StepsForward + 1
                 };
 
-            var forwardNode = new LSystemNode<ModuleData>(stepNumber, new ParametricModuleMoveForward(forwardModuleData));
+            var forwardNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleMoveForward(forwardModuleData));
             
-            return new List<LSystemNode<ModuleData>>(new[] { forwardNode });
+            return new List<LSystemNode<ParametricModuleData>>(new[] { forwardNode });
         }
     }
     
@@ -338,7 +338,7 @@ namespace LSystemTest
 
                 string dataString = currentNode.Value.NodeModule.Data.ToString();
 
-                if(currentNode.Value.NodeModule.Data.GetType().ToString() == "LSystemTest.ModuleData")
+                if(currentNode.Value.NodeModule.Data.GetType().ToString() == "LSystemTest.ParametricModuleData")
                 {
                     var stringParts = dataString.Split(',');
 
@@ -381,23 +381,23 @@ namespace LSystemTest
         public void ParametricTest()
         {
             var axiom =
-                new List<LSystemNode<ModuleData>>()
+                new List<LSystemNode<ParametricModuleData>>()
                 {
-                    new LSystemNode<ModuleData>(0, new ParametricModuleEndPoint(new ModuleData()))
+                    new LSystemNode<ParametricModuleData>(0, new ParametricModuleEndPoint(new ParametricModuleData()))
                 };
 
             var productions =
-                new List<LSystemProduction<ModuleData>>
+                new List<LSystemProduction<ParametricModuleData>>
                 {
                     new ParametricProdction1(),
                     new ParametricProduction2()
                 };
 
-            var parametricLSystem = new LSystem<ModuleData>(axiom, productions);
+            var parametricLSystem = new LSystem<ParametricModuleData>(axiom, productions);
 
             var intialState =
-                new LSystemState<ModuleData>(
-                    new ModuleData()
+                new LSystemState<ParametricModuleData>(
+                    new ParametricModuleData()
                     {
                         PositionX = 0,
                         PositionY = 0
@@ -407,8 +407,8 @@ namespace LSystemTest
             parametricLSystem.RunProduction();
 
             intialState =
-                new LSystemState<ModuleData>(
-                    new ModuleData()
+                new LSystemState<ParametricModuleData>(
+                    new ParametricModuleData()
                     {
                         PositionX = 0,
                         PositionY = 0
@@ -418,8 +418,8 @@ namespace LSystemTest
             parametricLSystem.RunProduction();
 
             intialState =
-                new LSystemState<ModuleData>(
-                    new ModuleData()
+                new LSystemState<ParametricModuleData>(
+                    new ParametricModuleData()
                     {
                         PositionX = 0,
                         PositionY = 0
@@ -429,8 +429,8 @@ namespace LSystemTest
             parametricLSystem.RunProduction();
 
             intialState =
-                new LSystemState<ModuleData>(
-                    new ModuleData()
+                new LSystemState<ParametricModuleData>(
+                    new ParametricModuleData()
                     {
                         PositionX = 0,
                         PositionY = 0
