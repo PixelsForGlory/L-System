@@ -1,0 +1,2 @@
+msbuild $env:APPVEYOR_BUILD_FOLDER\LSystem.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:Platform="Any CPU" /v:minimal
+if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode)  }

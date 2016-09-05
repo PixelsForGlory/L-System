@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PixelsForGlory.Unity3D.LSystem</id>
+    <version>0.0.0</version>
+    <authors>afuzzyllama</authors>
+    <owners>afuzzyllama</owners>
+    <licenseUrl>https://github.com/PixelsForGlory/L-System/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/PixelsForGlory/L-System/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>L-System implementation. Installs into Unity3D project.</description>
+    <copyright>Copyright 2016</copyright>
+    <tags></tags>
+  </metadata>
+  <files>
+    <file src="LSystem\bin\Release\PixelsForGlory.ComputationalSystem.LSystem.dll" target="content\Assets\Plugins\" />
+    <file src="LSystem\bin\Release\PixelsForGlory.ComputationalSystem.LSystem.pdb" target="content\Assets\Plugins\" />
+    <file src="NuGetTools\Uninstall.ps1" target="tools\PixelsForGlory\LSystem\" />
+  </files>
+</package>

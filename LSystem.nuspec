@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PixelsForGlory.LSystem</id>
+    <version>0.0.0</version>
+    <authors>afuzzyllama</authors>
+    <owners>afuzzyllama</owners>
+    <licenseUrl>https://github.com/PixelsForGlory/L-System/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/PixelsForGlory/L-System/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>L-System implementation.</description>
+    <copyright>Copyright 2016</copyright>
+    <tags></tags>
+  </metadata>
+  <files>
+    <file src="LSystem\bin\Release\PixelsForGlory.ComputationalSystem.LSystem.dll" target="lib\net35" />
+    <file src="LSystem\bin\Release\PixelsForGlory.ComputationalSystem.LSystem.pdb" target="lib\net35" />
+  </files>
+</package>
