@@ -40,9 +40,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ICopy.cs" />
+    <Compile Include="ILSystemQueryableModule.cs" />
     <Compile Include="LSystem.cs" />
     <Compile Include="LSystemNode.cs" />
-    <Compile Include="LSystemModule.cs" />
+    <Compile Include="ILSystemModule.cs" />
     <Compile Include="LSystemProduction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LSystemState.cs" />

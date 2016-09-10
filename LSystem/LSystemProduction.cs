@@ -12,23 +12,23 @@ namespace PixelsForGlory.ComputationalSystem
         /// <summary>
         /// Module type for the left context.  Null if no left context.
         /// </summary>
-        public readonly Type LeftContext;
+        private readonly Type _leftContext;
 
         /// <summary>
         /// Module type for the predecessor.
         /// </summary>
-        public readonly Type StrictPredecessor;
+        private readonly Type _strictPredecessor;
 
         /// <summary>
         /// Module type for the right context.  Null if no right context.
         /// </summary>
-        public readonly Type RightContext;
+        private readonly Type _rightContext;
 
         protected LSystemProduction(Type leftContext, Type strictPredecessor, Type rightContext)
         {
-            LeftContext = leftContext;
-            StrictPredecessor = strictPredecessor;
-            RightContext = rightContext;
+            _leftContext = leftContext;
+            _strictPredecessor = strictPredecessor;
+            _rightContext = rightContext;
         }
 
         /// <summary>
@@ -49,17 +49,17 @@ namespace PixelsForGlory.ComputationalSystem
                 return null;
             }
 
-            if(currentNode.Value.NodeModule.GetType() != StrictPredecessor)
+            if(currentNode.Value.NodeModule.GetType() != _strictPredecessor)
             {
                 return null;
             }
 
-            if(LeftContext != null && currentNode.Previous != null && currentNode.Previous.Value.NodeModule.GetType() != LeftContext)
+            if(_leftContext != null && currentNode.Previous != null && currentNode.Previous.Value.NodeModule.GetType() != _leftContext)
             {
                 return null;
             }
 
-            if(RightContext != null && currentNode.Next != null && currentNode.Next.Value.NodeModule.GetType() != RightContext)
+            if(_rightContext != null && currentNode.Next != null && currentNode.Next.Value.NodeModule.GetType() != _rightContext)
             {
                 return null;
             }

@@ -12,7 +12,7 @@ namespace PixelsForGlory.ComputationalSystem
         /// <summary>
         /// Module that node represents
         /// </summary>
-        public LSystemModule<T> NodeModule;
+        public ILSystemModule<T> NodeModule;
 
         /// <summary>
         /// Optional supporting branch off this node.  This is what is usually represented in brackets.
@@ -24,7 +24,7 @@ namespace PixelsForGlory.ComputationalSystem
         /// </summary>
         public int CreatedStepNumber { get; private set; }
 
-        public LSystemNode(int stepNumber, LSystemModule<T> nodeModule, LinkedList<LSystemNode<T>> supportingBranch = null)
+        public LSystemNode(int stepNumber, ILSystemModule<T> nodeModule, LinkedList<LSystemNode<T>> supportingBranch = null)
         {
             CreatedStepNumber = stepNumber;
             NodeModule = nodeModule;

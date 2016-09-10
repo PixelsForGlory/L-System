@@ -96,9 +96,9 @@ namespace PixelsForGlory.ComputationalSystem
             {
                 linkedListNode.Value.NodeModule?.ChangeState(state);
 
-                if(linkedListNode.Value.NodeModule is LSystemQueryModule<T>)
+                if(linkedListNode.Value.NodeModule is ILSystemQueryableModule<T>)
                 {
-                    var queryModule = (LSystemQueryModule<T>) linkedListNode.Value.NodeModule;
+                    var queryModule = (ILSystemQueryableModule<T>) linkedListNode.Value.NodeModule;
                     queryModule.QueryState(state);
                 }
 

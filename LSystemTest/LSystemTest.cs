@@ -7,26 +7,29 @@ using PixelsForGlory.ComputationalSystem;
 namespace LSystemTest
 {
     #region ContextSensitive
-    public class ContextSensitiveModuleA : LSystemModule<int>
+    public class ContextSensitiveModuleA : ILSystemModule<int>
     {
-        public ContextSensitiveModuleA(int data) : base(data){}
+        public int F { get; private set; }
 
-        public override void ChangeState(LSystemState<int> systemState)
+        public ContextSensitiveModuleA(int f)
         {
-            // Does nothing
+            F = f;
         }
+
+        public void ChangeState(LSystemState<int> systemState) { /* Does nothing */ }
     }
 
-    public class ContextSensitiveModuleB : LSystemModule<int>
+    public class ContextSensitiveModuleB : ILSystemModule<int>
     {
-        public ContextSensitiveModuleB(int data) : base(data){}
+        public int F { get; private set; }
 
-        public override void ChangeState(LSystemState<int> systemState)
+        public ContextSensitiveModuleB(int f)
         {
-            // Does nothing
+            F = f;
         }
-    }
 
+        public void ChangeState(LSystemState<int> systemState) { /* Does nothing */ }
+    }
 
     public class ContextSensitiveProduction1 : LSystemProduction<int>
     {
@@ -43,8 +46,8 @@ namespace LSystemTest
 
         protected override List<LSystemNode<int>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<int>> currentNode)
         {
-            var a = currentNode.Value.NodeModule;
-            var node = new LSystemNode<int>(stepNumber, new ContextSensitiveModuleA(a.Data + 1));
+            var a = (ContextSensitiveModuleA)currentNode.Value.NodeModule;
+            var node = new LSystemNode<int>(stepNumber, new ContextSensitiveModuleA(a.F + 1));
             return new List<LSystemNode<int>>(new[] { node });
         }
     }
@@ -65,8 +68,8 @@ namespace LSystemTest
 
         protected override List<LSystemNode<int>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<int>> currentNode)
         {
-            var a = currentNode.Value.NodeModule;
-            var node = new LSystemNode<int>(stepNumber, new ContextSensitiveModuleB(a.Data - 1));
+            var a = (ContextSensitiveModuleA)currentNode.Value.NodeModule;
+            var node = new LSystemNode<int>(stepNumber, new ContextSensitiveModuleB(a.F - 1));
             return new List<LSystemNode<int>>(new[] { node });
         }
     }
@@ -77,8 +80,8 @@ namespace LSystemTest
 
         protected override bool Condition(LinkedListNode<LSystemNode<int>> currentNode)
         {
-            var b = currentNode.Value.NodeModule;
-            return b.Data < 4;
+            var b = (ContextSensitiveModuleB)currentNode.Value.NodeModule;
+            return b.F < 4;
         }
 
         protected override bool Probability(LinkedListNode<LSystemNode<int>> currentNode)
@@ -89,44 +92,42 @@ namespace LSystemTest
         protected override List<LSystemNode<int>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<int>> currentNode)
         {
             // ReSharper disable PossibleNullReferenceException
-            var leftContext = currentNode.Previous.Value.NodeModule;
-            var predecessor = currentNode.Value.NodeModule;
-            var rightContext = currentNode.Next.Value.NodeModule;
+            var leftContext = (ContextSensitiveModuleA)currentNode.Previous.Value.NodeModule;
+            var predecessor = (ContextSensitiveModuleB)currentNode.Value.NodeModule;
+            var rightContext = (ContextSensitiveModuleA)currentNode.Next.Value.NodeModule;
             // ReSharper restore PossibleNullReferenceException
 
             var node = 
-                new LSystemNode<int>(stepNumber, new ContextSensitiveModuleB(leftContext.Data + rightContext.Data),
-                new LinkedList<LSystemNode<int>>(new[] { new LSystemNode<int>(stepNumber, new ContextSensitiveModuleA(predecessor.Data)) }));
+                new LSystemNode<int>(stepNumber, new ContextSensitiveModuleB(leftContext.F + rightContext.F),
+                new LinkedList<LSystemNode<int>>(new[] { new LSystemNode<int>(stepNumber, new ContextSensitiveModuleA(predecessor.F)) }));
 
             return new List<LSystemNode<int>>(new[] { node });
         }
     }
     #endregion
 
-    public class ParametricModuleData : ICopy<ParametricModuleData>
+    public class ParametricState : ICopy<ParametricState>
     {
         public int PositionX;
         public int PositionY;
-        public int StepsForward;
         public int Rotation;
 
         public override string ToString()
         {
-            return string.Format("{0},{1},{2},{3}", PositionX, PositionY, StepsForward, Rotation);
+            return string.Format("{0},{1},{2}", PositionX, PositionY, Rotation);
         }
 
-        public ParametricModuleData ShallowCopy()
+        public ParametricState ShallowCopy()
         {
             throw new NotImplementedException();
         }
 
-        public ParametricModuleData DeepCopy()
+        public ParametricState DeepCopy()
         {
-            var returnData = new ParametricModuleData
+            var returnData = new ParametricState
             {
                 PositionX = PositionX,
                 PositionY = PositionY,
-                StepsForward = StepsForward,
                 Rotation = Rotation
             };
 
@@ -134,47 +135,52 @@ namespace LSystemTest
         }
     }
 
-    public class ParametricModuleEndPoint : LSystemModule<ParametricModuleData>
+    public class ParametricModuleEndPoint : ILSystemModule<ParametricState>
     {
-        public ParametricModuleEndPoint(ParametricModuleData data) : base(data){}
-
-        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
-        {
-            // Do nothing
-        }
+        public void ChangeState(LSystemState<ParametricState> systemState) { /* Do nothing */ }
     }
 
-    public class ParametricModuleMoveForward : LSystemModule<ParametricModuleData>
+    public class ParametricModuleMoveForward : ILSystemModule<ParametricState>
     {
-        public ParametricModuleMoveForward(ParametricModuleData data) : base(data){}
+        public int StepsForward { get; private set; }
 
-        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
+        public ParametricModuleMoveForward(int stepsForward)
+        {
+            StepsForward = stepsForward;
+        }
+
+        public void ChangeState(LSystemState<ParametricState> systemState)
         {
             switch(systemState.CurrentState.Rotation)
             {
                 case 0:
-                    systemState.CurrentState.PositionY += Data.StepsForward;
+                    systemState.CurrentState.PositionY += StepsForward;
                     break;
                 case 90:
-                    systemState.CurrentState.PositionX += Data.StepsForward;
+                    systemState.CurrentState.PositionX += StepsForward;
                     break;
                 case 180:
-                    systemState.CurrentState.PositionY -= Data.StepsForward;
+                    systemState.CurrentState.PositionY -= StepsForward;
                     break;
                 case 270:
-                    systemState.CurrentState.PositionX -= Data.StepsForward;
+                    systemState.CurrentState.PositionX -= StepsForward;
                     break;
             }
         }
     }
 
-    public class ParametricModuleRotate : LSystemModule<ParametricModuleData>
+    public class ParametricModuleRotate : ILSystemModule<ParametricState>
     {
-        public ParametricModuleRotate(ParametricModuleData data) : base(data){}
+        public int Rotation { get; private set; }
 
-        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
+        public ParametricModuleRotate(int rotation)
         {
-            systemState.CurrentState.Rotation += Data.Rotation;
+            Rotation = rotation;
+        }
+
+        public void ChangeState(LSystemState<ParametricState> systemState)
+        {
+            systemState.CurrentState.Rotation += Rotation;
 
             if(systemState.CurrentState.Rotation >= 360)
             {
@@ -183,93 +189,65 @@ namespace LSystemTest
         }
     }
 
-    public class ParametricModulePoint : LSystemQueryModule<ParametricModuleData>
+    public class ParametricModulePoint : ILSystemQueryableModule<ParametricState>
     {
-        public ParametricModulePoint(ParametricModuleData data) : base(data){}
+        public int QueriedPositionX { get; private set; }
+        public int QueriedPositionY { get; private set; }
 
-        public override void ChangeState(LSystemState<ParametricModuleData> systemState)
-        {
-            // Do nothing
-        }
+        public void ChangeState(LSystemState<ParametricState> systemState) { /* Does nothing */ }
 
-        public override void QueryState(LSystemState<ParametricModuleData> systemState)
+        public void QueryState(LSystemState<ParametricState> systemState)
         {
-            Data.PositionX = systemState.CurrentState.PositionX;
-            Data.PositionY = systemState.CurrentState.PositionY;
+            QueriedPositionX = systemState.CurrentState.PositionX;
+            QueriedPositionY = systemState.CurrentState.PositionY;
         }
     }
 
-    public class ParametricProdction1 : LSystemProduction<ParametricModuleData>
+    public class ParametricProdction1 : LSystemProduction<ParametricState>
     {
         public ParametricProdction1() : base(null, typeof(ParametricModuleEndPoint), null){}
 
-        protected override bool Condition(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
+        protected override bool Condition(LinkedListNode<LSystemNode<ParametricState>> predecessor)
         {
             return true;
         }
 
-        protected override bool Probability(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
+        protected override bool Probability(LinkedListNode<LSystemNode<ParametricState>> predecessor)
         {
             return true;
         }
 
-        protected override List<LSystemNode<ParametricModuleData>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
+        protected override List<LSystemNode<ParametricState>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ParametricState>> predecessor)
         {
-            var forwardModuleData =
-                new ParametricModuleData()
-                {
-                    PositionX = 0,
-                    PositionY = 0,
-                    Rotation = 0,
-                    StepsForward = 1
-                };
+            var forwardNode = new LSystemNode<ParametricState>(stepNumber, new ParametricModuleMoveForward(1));
+            var pointNode = new LSystemNode<ParametricState>(stepNumber, new ParametricModulePoint());
+            var rotationNode = new LSystemNode<ParametricState>(stepNumber, new ParametricModuleRotate(90));
+            var endPointNode = new LSystemNode<ParametricState>(stepNumber, new ParametricModuleEndPoint());
 
-            var rotateModuleData =
-                new ParametricModuleData()
-                {
-                    PositionX = 0,
-                    PositionY = 0,
-                    Rotation = 90,
-                    StepsForward = 0
-                };
-
-            var forwardNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleMoveForward(forwardModuleData));
-            var pointNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModulePoint(new ParametricModuleData()));
-            var rotationNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleRotate(rotateModuleData));
-            var endPointNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleEndPoint(new ParametricModuleData()));
-
-            return new List<LSystemNode<ParametricModuleData>>(new[] { forwardNode, pointNode, rotationNode, endPointNode });
+            return new List<LSystemNode<ParametricState>>(new[] { forwardNode, pointNode, rotationNode, endPointNode });
         }
     }
 
-    public class ParametricProduction2 : LSystemProduction<ParametricModuleData>
+    public class ParametricProduction2 : LSystemProduction<ParametricState>
     {
         public ParametricProduction2() : base(null, typeof(ParametricModuleMoveForward), null){}
 
-        protected override bool Condition(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
+        protected override bool Condition(LinkedListNode<LSystemNode<ParametricState>> predecessor)
         {
             return true;
         }
 
-        protected override bool Probability(LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
+        protected override bool Probability(LinkedListNode<LSystemNode<ParametricState>> predecessor)
         {
             return true;
         }
 
-        protected override List<LSystemNode<ParametricModuleData>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ParametricModuleData>> predecessor)
+        protected override List<LSystemNode<ParametricState>> CreateSuccessor(int stepNumber, LinkedListNode<LSystemNode<ParametricState>> predecessor)
         {
-            var forwardModuleData =
-                new ParametricModuleData()
-                {
-                    PositionX = 0,
-                    PositionY = 0,
-                    Rotation = 0,
-                    StepsForward = predecessor.Value.NodeModule.Data.StepsForward + 1
-                };
-
-            var forwardNode = new LSystemNode<ParametricModuleData>(stepNumber, new ParametricModuleMoveForward(forwardModuleData));
+            var module = (ParametricModuleMoveForward) predecessor.Value.NodeModule;
+            var forwardNode = new LSystemNode<ParametricState>(stepNumber, new ParametricModuleMoveForward(module.StepsForward + 1));
             
-            return new List<LSystemNode<ParametricModuleData>>(new[] { forwardNode });
+            return new List<LSystemNode<ParametricState>>(new[] { forwardNode });
         }
     }
     
@@ -287,8 +265,8 @@ namespace LSystemTest
                 new List<LSystemNode<int>>()
                 {
                     new LSystemNode<int>(0, new ContextSensitiveModuleA(1)),
-                    new LSystemNode<int>(0,new ContextSensitiveModuleB(2)),
-                    new LSystemNode<int>(0,new ContextSensitiveModuleA(3))
+                    new LSystemNode<int>(0, new ContextSensitiveModuleB(2)),
+                    new LSystemNode<int>(0, new ContextSensitiveModuleA(3))
                 };
 
             var productions =
@@ -306,6 +284,69 @@ namespace LSystemTest
             Assert.AreEqual("A(1)B(4)[A(2)]A(3)", GetLSystemString(contextSensitiveLSystem.GetCurrentDerivation()));
         }
 
+        [TestMethod]
+        public void ParametricTest()
+        {
+            var axiom =
+                new List<LSystemNode<ParametricState>>()
+                {
+                    new LSystemNode<ParametricState>(0, new ParametricModuleEndPoint())
+                };
+
+            var productions =
+                new List<LSystemProduction<ParametricState>>
+                {
+                    new ParametricProdction1(),
+                    new ParametricProduction2()
+                };
+
+            var parametricLSystem = new LSystem<ParametricState>(axiom, productions);
+
+            var intialState =
+                new LSystemState<ParametricState>(
+                    new ParametricState()
+                    {
+                        PositionX = 0,
+                        PositionY = 0
+                    });
+            Assert.AreEqual("A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
+
+            parametricLSystem.RunProduction();
+
+            intialState =
+                new LSystemState<ParametricState>(
+                    new ParametricState()
+                    {
+                        PositionX = 0,
+                        PositionY = 0
+                    });
+            Assert.AreEqual("F(1)?P(0, 1)-A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
+
+            parametricLSystem.RunProduction();
+
+            intialState =
+                new LSystemState<ParametricState>(
+                    new ParametricState()
+                    {
+                        PositionX = 0,
+                        PositionY = 0
+                    });
+            Assert.AreEqual("F(2)?P(0, 2)-F(1)?P(1, 2)-A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
+
+            parametricLSystem.RunProduction();
+
+            intialState =
+                new LSystemState<ParametricState>(
+                    new ParametricState()
+                    {
+                        PositionX = 0,
+                        PositionY = 0,
+                        Rotation = 0
+                    });
+            Assert.AreEqual("F(3)?P(0, 3)-F(2)?P(2, 3)-F(1)?P(2, 2)-A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
+        }
+
+
         private static string GetLSystemString<T>(LinkedList<LSystemNode<T>> lsystem)
         {
             string returnString = string.Empty;
@@ -314,46 +355,38 @@ namespace LSystemTest
             while(currentNode != null)
             {
                 string typeName = currentNode.Value.NodeModule.GetType().ToString();
-                switch(typeName)
+                string dataString = string.Empty;
+                if(typeName == "LSystemTest.ContextSensitiveModuleA")
                 {
-                    case "LSystemTest.ContextSensitiveModuleA":
-                        typeName = "A";
-                        break;
-                    case "LSystemTest.ContextSensitiveModuleB":
-                        typeName = "B";
-                        break;
-                    case "LSystemTest.ParametricModuleMoveForward":
-                        typeName = "F";
-                        break;
-                    case "LSystemTest.ParametricModulePoint":
-                        typeName = "?P";
-                        break;
-                    case "LSystemTest.ParametricModuleRotate":
-                        typeName = "-";
-                        break;
-                    case "LSystemTest.ParametricModuleEndPoint":
-                        typeName = "A";
-                        break;
+                    typeName = "A";
+                    var module = (ContextSensitiveModuleA)currentNode.Value.NodeModule;
+                    dataString = module.F.ToString();
                 }
-
-                string dataString = currentNode.Value.NodeModule.Data.ToString();
-
-                if(currentNode.Value.NodeModule.Data.GetType().ToString() == "LSystemTest.ParametricModuleData")
+                else if(typeName == "LSystemTest.ContextSensitiveModuleB")
                 {
-                    var stringParts = dataString.Split(',');
-
-                    switch(typeName)
-                    {
-                        case "?P":
-                            dataString = stringParts[0] + ", " + stringParts[1];
-                            break;
-                        case "F":
-                            dataString = stringParts[2];
-                            break;
-                        default:
-                            dataString = string.Empty;
-                            break;
-                    }
+                    typeName = "B";
+                    var module = (ContextSensitiveModuleB)currentNode.Value.NodeModule;
+                    dataString = module.F.ToString();
+                }
+                else if(typeName == "LSystemTest.ParametricModuleMoveForward")
+                {
+                    typeName = "F";
+                    var module = (ParametricModuleMoveForward)currentNode.Value.NodeModule;
+                    dataString = module.StepsForward.ToString();
+                }
+                else if(typeName == "LSystemTest.ParametricModulePoint")
+                {
+                    typeName = "?P";
+                    var module = (ParametricModulePoint)currentNode.Value.NodeModule;
+                    dataString = module.QueriedPositionX + ", " + module.QueriedPositionY;
+                }
+                else if(typeName == "LSystemTest.ParametricModuleRotate")
+                {
+                    typeName = "-";
+                }
+                else if(typeName == "LSystemTest.ParametricModuleEndPoint")
+                {
+                    typeName = "A";
                 }
 
                 if(dataString != string.Empty)
@@ -375,67 +408,6 @@ namespace LSystemTest
             }
 
             return returnString;
-        }
-
-        [TestMethod]
-        public void ParametricTest()
-        {
-            var axiom =
-                new List<LSystemNode<ParametricModuleData>>()
-                {
-                    new LSystemNode<ParametricModuleData>(0, new ParametricModuleEndPoint(new ParametricModuleData()))
-                };
-
-            var productions =
-                new List<LSystemProduction<ParametricModuleData>>
-                {
-                    new ParametricProdction1(),
-                    new ParametricProduction2()
-                };
-
-            var parametricLSystem = new LSystem<ParametricModuleData>(axiom, productions);
-
-            var intialState =
-                new LSystemState<ParametricModuleData>(
-                    new ParametricModuleData()
-                    {
-                        PositionX = 0,
-                        PositionY = 0
-                    });
-            Assert.AreEqual("A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
-
-            parametricLSystem.RunProduction();
-
-            intialState =
-                new LSystemState<ParametricModuleData>(
-                    new ParametricModuleData()
-                    {
-                        PositionX = 0,
-                        PositionY = 0
-                    });
-            Assert.AreEqual("F(1)?P(0, 1)-A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
-
-            parametricLSystem.RunProduction();
-
-            intialState =
-                new LSystemState<ParametricModuleData>(
-                    new ParametricModuleData()
-                    {
-                        PositionX = 0,
-                        PositionY = 0
-                    });
-            Assert.AreEqual("F(2)?P(0, 2)-F(1)?P(1, 2)-A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
-
-            parametricLSystem.RunProduction();
-
-            intialState =
-                new LSystemState<ParametricModuleData>(
-                    new ParametricModuleData()
-                    {
-                        PositionX = 0,
-                        PositionY = 0
-                    });
-            Assert.AreEqual("F(3)?P(0, 3)-F(2)?P(2, 3)-F(1)?P(2, 2)-A", GetLSystemString(parametricLSystem.GetCurrentDerivation(intialState)));
         }
     }
 }
