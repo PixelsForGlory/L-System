@@ -1,7 +1,7 @@
-# Pixels for Glory Extensions
-Extensions used by Pixels for Glory libraries 
+# Pixels for Glory L-System
+Type based [Lindenmayer system](https://en.wikipedia.org/wiki/L-system).  This library generates l-systems that are based on collection of class types. 
 
-[![Build status](https://ci.appveyor.com/api/projects/status/7lwdnqh8b6nk37uv/branch/master?svg=true)](https://ci.appveyor.com/project/LlamaBot/extensions/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/o3tifl663x9caedo/branch/master?svg=true)](https://ci.appveyor.com/project/LlamaBot/lsystem/branch/master)
 
 ## Building
 Nothing special.  Build from solution.
@@ -12,6 +12,15 @@ From a build or downloaded release, copy the `PixelsForGlory.ComputationalSystem
 If using the Pixels for Glory NuGet repository at http://pixelsforglory.azurewebsites.net/nuget, install the `PixelsForGlory.LSystem` package into your own class library project or install the `PixelsForGlory.Unity3D.LSystem` package into a Unity3D project.
 
 ## Usage
+
+The examples below show a context sensitive l-system and a parametric l-system.  Instead of using the traditional string to represent the system a list of objects are used instead.
+
+Below are classes and interfaces a developer will need to implement to create his/her own system:
+
+- `ICopy` should be implemented by types that represent the state of an l-system during a production run.  When traversing down a supporting branch of a system, the state will need to be deep copied.
+- `ILSystemModule` represents a module in the l-system.  In the context of the wikipedia article, this interface represents variables and constants in the examples.
+- `ILSystemQueryableModule` represents a module in the l-system that can be queried during production.  In the context of the wikipedia article, this interface represents "Parametric grammars".  These are useful if trying to draw the l-system.
+- `LSystemProduction` represents a context sensitive grammar for a production of the l-system.  Has built in condition and probablity which can be defined for each production.  
 
 ### Context Sensitive Example
 
@@ -307,6 +316,8 @@ If using the Pixels for Glory NuGet repository at http://pixelsforglory.azureweb
                     PositionY = 0,
                     Rotation = 0
                 });
+
+        contextSensitiveLSystem.RunProduction();
         parametricLSystem.GetCurrentDerivation(intialState);
  
 ## Citations
