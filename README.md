@@ -9,7 +9,7 @@ Nothing special.  Build from solution.
 ## Installation
 From a build or downloaded release, copy the `PixelsForGlory.ComputationalSystem.LSystem.dll` to `[PROJECT DIR]\Assets\Plugins`.
 
-If using the Pixels for Glory NuGet repository at http://pixelsforglory.azurewebsites.net/nuget, install the `PixelsForGlory.LSystem` package into your own class library project or install the `PixelsForGlory.Unity3D.LSystem` package into a Unity3D project.
+If using NuGet, install the `PixelsForGlory.LSystem` package into your own class library project or install the `PixelsForGlory.Unity3D.LSystem` package into a Unity3D project.
 
 ## Usage
 
