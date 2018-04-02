@@ -1,15 +1,10 @@
-# Pixels for Glory L-System
+# L-System
 Type based [Lindenmayer system](https://en.wikipedia.org/wiki/L-system).  This library generates l-systems that are based on collection of class types. 
 
 [![Build status](https://ci.appveyor.com/api/projects/status/o3tifl663x9caedo/branch/master?svg=true)](https://ci.appveyor.com/project/LlamaBot/lsystem/branch/master)
 
 ## Building
 Nothing special.  Build from solution.
-
-## Installation
-From a build or downloaded release, copy the `PixelsForGlory.ComputationalSystem.LSystem.dll` to `[PROJECT DIR]\Assets\Plugins`.
-
-If using NuGet, install the `PixelsForGlory.LSystem` package into your own class library project or install the `PixelsForGlory.Unity3D.LSystem` package into a Unity3D project.
 
 ## Usage
 
